@@ -89,6 +89,12 @@ COOLDOWN_HOURS = 2
 
 CANDLE_INTERVAL = "FIVE_MINUTE"
 SCAN_INTERVAL_MINUTES = 15
+SCAN_OFFSET_MINUTES = 9     # staggers this bot's scan start relative to other bots
+                             # sharing your Telegram/reading attention, so 5 bots
+                             # running simultaneously don't all alert in the same
+                             # few seconds. Each bot in your 5-bot setup should use
+                             # a DIFFERENT offset (e.g. 0, 3, 6, 9, 12) - see the
+                             # README for the full staggering scheme.
 
 # MCX trading hours are NOT uniform across commodities: bullion/base
 # metals/energy typically trade 9:00 AM - 11:30 PM IST (11:55 PM during
