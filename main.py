@@ -187,8 +187,12 @@ def bootstrap():
     open_h, _ = map(int, config.MARKET_OPEN.split(":"))
     close_h, _ = map(int, config.MARKET_CLOSE.split(":"))
 
+    # Staggered minute list, e.g. offset=3, interval=15 -> "3,18,33,48" -
+    # this bot's scans never land on the same minute as another bot using
+    # a different SCAN_OFFSET_MINUTES, spreading out simultaneous alerts.
+    scan_minutes = ",".join(str(m) for m in range(config.SCAN_OFFSET_MINUTES, 60, config.SCAN_INTERVAL_MINUTES))
     scheduler.add_job(job_scan, CronTrigger(
-        day_of_week="mon-fri", hour=f"{open_h}-{close_h}", minute=f"*/{config.SCAN_INTERVAL_MINUTES}"
+        day_of_week="mon-fri", hour=f"{open_h}-{close_h}", minute=scan_minutes
     ), id="scan")
 
     reset_h, reset_m = map(int, config.MORNING_RESET_TIME.split(":"))
