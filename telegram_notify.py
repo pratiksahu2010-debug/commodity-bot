@@ -11,10 +11,16 @@ never leak into BOT2's chat, etc.
 import logging
 import requests
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 log = logging.getLogger("telegram")
 
 TELEGRAM_API_BASE = "https://api.telegram.org/bot{token}/sendMessage"
+IST = ZoneInfo("Asia/Kolkata")  # Render's servers run UTC - this forces true IST
+                                 # regardless of server timezone (bug fix: previously
+                                 # used naive datetime.now(), which returned server
+                                 # UTC time mislabeled as "IST" - alerts showed a time
+                                 # 5.5 hours behind actual IST)
 
 
 def _send(token: str, chat_id: str, text: str, retries: int = 2) -> str:
@@ -52,7 +58,7 @@ def send_trade_alert(token, chat_id, bot_name, signal_result, symbol) -> str:
     """
     r = signal_result
     checkmark = "✅"
-    now_ist = datetime.now().strftime("%Y-%m-%d %H:%M:%S IST")
+    now_ist = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S IST")
 
     text = (
         f"📊 *{bot_name}*\n"
@@ -81,7 +87,7 @@ def send_early_signal(token, chat_id, bot_name, signal_result, symbol) -> str:
     confirmed-trade alert so the two are never confused.
     """
     r = signal_result
-    now_ist = datetime.now().strftime("%Y-%m-%d %H:%M:%S IST")
+    now_ist = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S IST")
 
     text = (
         f"👀 *{bot_name}*\n"
